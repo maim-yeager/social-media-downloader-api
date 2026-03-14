@@ -1,0 +1,12 @@
+node_modules
+data
+.env
+*.log
+.git
+.gitignore
+README.md
+docker-compose.yml
+tests/
+docs/
+coverage/
+.nyc_output/

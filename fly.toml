@@ -1,0 +1,64 @@
+app = "social-media-downloader-api"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 3007
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 100
+    soft_limit = 80
+
+[[mounts]]
+  source = "social_media_data"
+  destination = "/data"
+  auto_extend_size_threshold = 80
+  auto_extend_size_increment = "1GB"
+  auto_extend_size_limit = "10GB"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3007"
+  DATA_PATH = "/data"
+  COOKIE_PATH = "/data/cookies"
+  TEMP_PATH = "/data/temp"
+  CACHE_PATH = "/data/cache"
+  LOG_PATH = "/data/logs"
+  DB_PATH = "/data/database.sqlite"
+  BACKUP_PATH = "/data/backups"
+  ENABLE_RATE_LIMITING = "true"
+  ENABLE_REQUEST_LOGGING = "true"
+  CORS_ORIGIN = "*"
+  MAX_CONCURRENT_DOWNLOADS = "5"
+  TEMP_RETENTION_HOURS = "1"
+  CACHE_TTL_HOURS = "24"
+  MAX_CACHE_SIZE_MB = "500"
+  COOKIE_ROTATION_STRATEGY = "weighted"
+  LOG_LEVEL = "info"
+
+[metrics]
+  port = 3007
+  path = "/api/stats"
+
+[checks]
+  [checks.health]
+    port = 3007
+    type = "http"
+    path = "/health"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
